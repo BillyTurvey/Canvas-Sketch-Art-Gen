@@ -1,42 +1,58 @@
 import canvasSketch from 'canvas-sketch';
+import { lerp } from 'canvas-sketch-util/math.js';
+import random from 'canvas-sketch-util/random.js'; 
+import colors from 'nice-color-palettes';
+
 
 const settings = {
   dimensions: [ 1048, 1048 ],
-  // pixelsPerInch: 300
+  pixelsPerInch: 300
 };
 
 const sketch = () => {
+  const palette = random.pick(colors);
 
   const createGrid = () => {
     const points = [];
-    const count = 5;
-    for (let x = 0; x < count; x++) {
-      for (let y = 0; y < count; y++) {
-        const u = x / count;
-        const v = y / count;
-        points.push([u,v])
+    const count = 10;
+    for (let x = 0; x < count; x++) {   // for every column
+      for (let y = 0; y < count; y++) { // for every horizontal point
+        const u =  count <= 1 ? 0.5 : x / (count - 1);
+        const v =  count <= 1 ? 0.5 : y / (count - 1);
+        points.push({
+          color : random.pick(palette),
+          position: [u,v],
+          radius: Math.abs(random.gaussian()*0.01)
+        });
       }
     }
     return points;
   };
 
-  const points = createGrid();
+  const seed = random.value();
+  console.log('Seed: ', seed);
+  random.setSeed(seed);
 
-  console.log(points);
+  const points = createGrid().filter(()=> random.value() > 0.08);
+  const margin = 100
 
   return ({ context, width, height }) => {
-    context.fillStyle = 'orange';
+    context.fillStyle = random.pick(palette);
     context.fillRect(0, 0, width, height);
 
-    points.forEach(([u, v]) => {
-      const x = u * width; //scaling back up to width in pixels
-      const y = v * height;
+    points.forEach(data => {
+      const {position, radius, color} = data;
+      const [u, v] = position;
+
+      console.log(color);
+
+      const x = lerp(margin, width-margin, u);
+      const y = lerp(margin, height-margin, v);
 
       context.beginPath();
-      context.arc(x + width/10, y + height/10, 100, 0, Math.PI *2, true);
-      context.strokeStyle = 'black';
-      context.lineWidth = 30;
-      context.stroke();
+      context.arc(x, y, radius*width, 0, Math.PI *2, true);
+      context.fillStyle = color;
+      context.fill();
     })
   };
 };
