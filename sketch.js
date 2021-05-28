@@ -3,6 +3,15 @@ import { lerp } from 'canvas-sketch-util/math.js';
 import random from 'canvas-sketch-util/random.js'; 
 import colors from 'nice-color-palettes';
 
+const cellularGoods = [
+  '#1D1D1D',
+  '#555555',
+  '#D6D4CE',
+  '#F0EDE6',
+  '#F5F5F5',
+  '#FFFFFF'
+]
+
 
 const settings = {
   dimensions: [ 1048, 1048 ],
@@ -10,7 +19,7 @@ const settings = {
 };
 
 const sketch = () => {
-  const palette = random.pick(colors);
+  const palette = cellularGoods;
 
   const createGrid = () => {
     const points = [];
